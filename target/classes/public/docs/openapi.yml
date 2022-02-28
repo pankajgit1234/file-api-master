@@ -1,0 +1,184 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: 'http://localhost:8080'
+    description: Generated server url
+paths:
+  /files:
+    post:
+      tags:
+        - upload-file-controller
+      operationId: uploadMultipartFile
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: contentType
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: meta
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/MetaDetails'
+        - name: source
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: expireTime
+          in: query
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - uploadfile
+              type: object
+              properties:
+                uploadfile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FileCreationResponse'
+  /files/metas:
+    post:
+      tags:
+        - download-file-controller
+      operationId: filesMetadata
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilesMetaDataRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FilesMetaDataResponse'
+  '/files/{token}/metas':
+    get:
+      tags:
+        - download-file-controller
+      operationId: fileMetadata
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FileMetaDataResponse'
+  '/files/{filetoken}':
+    get:
+      tags:
+        - download-file-controller
+      operationId: downloadFile
+      parameters:
+        - name: filetoken
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+    delete:
+      tags:
+        - download-file-controller
+      operationId: deleteFile
+      parameters:
+        - name: filetoken
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: boolean
+components:
+  schemas:
+    MetaDetails:
+      type: object
+      properties:
+        creatorEmployeeId:
+          type: string
+    FileCreationResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    FilesMetaDataRequest:
+      type: object
+      properties:
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenDetail'
+    TokenDetail:
+      type: object
+      properties:
+        token:
+          type: string
+    FileDetail:
+      type: object
+      properties:
+        token:
+          type: string
+        filename:
+          type: string
+        size:
+          type: integer
+          format: int64
+        contentType:
+          type: string
+        createTime:
+          type: string
+        meta:
+          $ref: '#/components/schemas/MetaDetails'
+    FilesMetaDataResponse:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileDetail'
+    FileMetaDataResponse:
+      type: object
+      properties:
+        file:
+          $ref: '#/components/schemas/FileDetail'
+
+security:
+  - basicAuth: []
