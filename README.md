@@ -5,3 +5,6 @@ File API to Upload, Download, Delete and to fetch File Details of MultipartFile 
 mvn clean install
 docker-compose build
 docker-compose up
+
+
+openapi.yml file describes all the endpoints
